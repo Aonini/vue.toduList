@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="box">
+       <heads @add-value="addValuePrent"></heads>
+       <list 
+        :list="list"
+        @remove-parent-list-item="removeParent"
+       ></list>
+      
+    </div>
+    <script src="./vue.js"></script>
+    <script>
+    
+        Vue.component("heads",{
+            // data里面是组件自己里面的东西
+            data(){
+					return {
+						value: ''
+					}
+				},
+            template:`<header>
+                            <input @keydown.13="addValue"   type="text" v-model="value"/>
+                        </header>`,
+             methods:{
+                 addValue(){
+                     this.$emit("add-value",this.value),
+                     this.value=""
+                 }
+             }
+
+        })
+        Vue.component("list",{
+            props:{
+                // 这面还没有结构   只是一个list   里面的title和ID都没拿出来
+                // 所以只是判断自己就可以  默认类型是复杂类型  所以不能直接判断 要是个函数 
+                // 默认是数组
+                list:{
+                    type:Array,
+                    default(){
+                        return []
+                    }
+                }
+            },
+            template:`<ul>
+                        <item @remove-item="removeListItem" v-for="item in list" :option="item"></item>
+                    </ul>`,
+                    // 上面要把每一项传过去
+          methods:{
+            removeListItem(id){
+                    this.$emit('remove-parent-list-item',id) 
+                }
+                 }
+        })
+       
+ Vue.component("item",{
+            props:{
+                // 对象类型
+                option:{
+                    type:Object,
+                    // 必填项目
+                    required:true
+                }
+            },
+            template:`  <li>
+                            <span>{{option.title}}</span>
+                            <button @click="removeItem">删除</button>
+                        </li>`,
+            // 做删除
+            methods:{
+                removeItem(){
+                    console.log(88898989898)
+                    this.$emit("remove-item",this.option.id)
+                }
+            }
+        })
+
+
+    new Vue({
+        el:"#box",
+        data:{
+            list:[{title:"新闻",id:8797}]
+        },
+        methods:{
+            addValuePrent(value){
+                this.list.push({
+                   title:value,
+                   id: Date.now(), 
+                })
+            },
+            removeParent(id){
+                let index= this.list.findIndex(item=>item.id===id)
+                if(index!==-1){
+                    this.list.splice(index,1)
+                }
+            }
+        }
+    })
+    </script>
+</body>
+</html>
